@@ -38,8 +38,8 @@ function initSmoothScrolling() {
 // Enhanced Scroll Animations with Exit Animations
 function initEnhancedScrollAnimations() {
     const observerOptions = {
-        threshold: [0, 0.1, 0.5, 0.9, 1],
-        rootMargin: '0px 0px -50px 0px'
+        threshold: [0.1, 0.5, 0.9],
+        rootMargin: '0px 0px -100px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -48,14 +48,14 @@ function initEnhancedScrollAnimations() {
             const isIntersecting = entry.isIntersecting;
             const intersectionRatio = entry.intersectionRatio;
             
-            // Add entrance animation
-            if (isIntersecting && intersectionRatio > 0.1) {
+            // Only trigger entrance animation once when element comes into view
+            if (isIntersecting && intersectionRatio > 0.1 && !element.classList.contains('visible')) {
                 element.classList.add('visible');
                 element.classList.remove('animate-out');
             }
             
-            // Add exit animation when element is scrolling out of view
-            if (!isIntersecting && element.classList.contains('visible')) {
+            // Only trigger exit animation when element is completely out of view
+            if (!isIntersecting && element.classList.contains('visible') && intersectionRatio === 0) {
                 element.classList.add('animate-out');
                 element.classList.remove('visible');
             }
@@ -77,16 +77,18 @@ function initEnhancedScrollAnimations() {
 // Section Entrance Animations
 function initSectionEntranceAnimations() {
     const sectionObserverOptions = {
-        threshold: 0.2,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: 0.3,
+        rootMargin: '0px 0px -150px 0px'
     };
 
     const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const section = entry.target;
             const isIntersecting = entry.isIntersecting;
+            const intersectionRatio = entry.intersectionRatio;
             
-            if (isIntersecting) {
+            // Only trigger entrance animation once when section is significantly in view
+            if (isIntersecting && intersectionRatio > 0.3 && !section.classList.contains('section-entrance-visible')) {
                 // Add entrance animation to section
                 section.classList.add('section-entrance-visible');
                 
@@ -94,11 +96,13 @@ function initSectionEntranceAnimations() {
                 const animatedChildren = section.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in, .card-entrance, .gallery-entrance');
                 animatedChildren.forEach((child, index) => {
                     setTimeout(() => {
-                        child.classList.add('visible');
-                    }, index * 150); // Stagger by 150ms
+                        if (!child.classList.contains('visible')) {
+                            child.classList.add('visible');
+                        }
+                    }, index * 200); // Increased stagger delay
                 });
-            } else {
-                // Add exit animation
+            } else if (!isIntersecting && intersectionRatio === 0 && section.classList.contains('section-entrance-visible')) {
+                // Only trigger exit animation when section is completely out of view
                 section.classList.remove('section-entrance-visible');
                 const animatedChildren = section.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in, .card-entrance, .gallery-entrance');
                 animatedChildren.forEach(child => {

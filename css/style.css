@@ -726,13 +726,19 @@ p {
 .section-entrance {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
-    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
 }
 
 .section-entrance.visible {
     opacity: 1;
     transform: translateY(0) scale(1);
+}
+
+.section-entrance.animate-out {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
 }
 
 /* Enhanced hover effects */
