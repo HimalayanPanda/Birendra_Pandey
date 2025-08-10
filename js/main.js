@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initEnhancedParallaxEffect();
     initHoverAnimations();
     initSectionEntranceAnimations();
+    initCollapsibleGrids();
 });
 
 // Smooth Scrolling Implementation
@@ -46,18 +47,13 @@ function initEnhancedScrollAnimations() {
         entries.forEach(entry => {
             const element = entry.target;
             const isIntersecting = entry.isIntersecting;
-            const intersectionRatio = entry.intersectionRatio;
+            // const intersectionRatio = entry.intersectionRatio;
             
-            // Only trigger entrance animation once when element comes into view
-            if (isIntersecting && intersectionRatio > 0.1 && !element.classList.contains('visible')) {
+            // Trigger entrance animation once when element comes into view; no exit animation
+            if (isIntersecting && !element.classList.contains('visible')) {
                 element.classList.add('visible');
                 element.classList.remove('animate-out');
-            }
-            
-            // Only trigger exit animation when element is completely out of view
-            if (!isIntersecting && element.classList.contains('visible') && intersectionRatio === 0) {
-                element.classList.add('animate-out');
-                element.classList.remove('visible');
+                observer.unobserve(element);
             }
         });
     }, observerOptions);
@@ -77,18 +73,18 @@ function initEnhancedScrollAnimations() {
 // Section Entrance Animations
 function initSectionEntranceAnimations() {
     const sectionObserverOptions = {
-        threshold: 0.3,
-        rootMargin: '0px 0px -150px 0px'
+        threshold: 0.2,
+        rootMargin: '0px 0px -120px 0px'
     };
 
     const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const section = entry.target;
             const isIntersecting = entry.isIntersecting;
-            const intersectionRatio = entry.intersectionRatio;
+            // const intersectionRatio = entry.intersectionRatio;
             
-            // Only trigger entrance animation once when section is significantly in view
-            if (isIntersecting && intersectionRatio > 0.3 && !section.classList.contains('section-entrance-visible')) {
+            // Trigger entrance animation once when section is in view; no exit animation
+            if (isIntersecting && !section.classList.contains('section-entrance-visible')) {
                 // Add entrance animation to section
                 section.classList.add('section-entrance-visible');
                 
@@ -99,16 +95,9 @@ function initSectionEntranceAnimations() {
                         if (!child.classList.contains('visible')) {
                             child.classList.add('visible');
                         }
-                    }, index * 200); // Increased stagger delay
+                    }, index * 80);
                 });
-            } else if (!isIntersecting && intersectionRatio === 0 && section.classList.contains('section-entrance-visible')) {
-                // Only trigger exit animation when section is completely out of view
-                section.classList.remove('section-entrance-visible');
-                const animatedChildren = section.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in, .card-entrance, .gallery-entrance');
-                animatedChildren.forEach(child => {
-                    child.classList.remove('visible');
-                    child.classList.add('animate-out');
-                });
+                sectionObserver.unobserve(section);
             }
         });
     }, sectionObserverOptions);
@@ -122,6 +111,12 @@ function initSectionEntranceAnimations() {
 
 // Enhanced Parallax Effect
 function initEnhancedParallaxEffect() {
+    // Disable parallax for reduced motion users and small screens
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+    if (prefersReduced || isSmallScreen) {
+        return;
+    }
     let ticking = false;
     
     function updateParallax() {
@@ -175,13 +170,14 @@ function initContactForm() {
             
             // Get form data
             const formData = new FormData(this);
+            const topic = formData.get('topic');
             const name = formData.get('name');
             const email = formData.get('email');
             const subject = formData.get('subject');
             const message = formData.get('message');
             
             // Basic validation
-            if (!name || !email || !subject || !message) {
+            if (!topic || !name || !email || !subject || !message) {
                 showNotification('Please fill in all fields.', 'error');
                 return;
             }
@@ -199,7 +195,8 @@ function initContactForm() {
             
             // Simulate form submission (replace with actual form handling)
             setTimeout(() => {
-                showNotification('Thank you for your message! I\'ll get back to you soon.', 'success');
+                const topicText = topic.charAt(0).toUpperCase() + topic.slice(1);
+                showNotification(`Thank you! Your ${topicText} inquiry has been received. We will get back to you soon.`, 'success');
                 this.reset();
                 submitButton.textContent = originalText;
                 submitButton.disabled = false;
@@ -322,7 +319,8 @@ function initActiveNavigation() {
 }
 
 // Initialize active navigation
-initActiveNavigation();
+// Only run active section highlighting on single-page anchors
+try { initActiveNavigation(); } catch (e) {}
 
 // Utility Functions
 function debounce(func, wait) {
@@ -407,3 +405,47 @@ const notificationStyles = `
 `;
 
 document.head.insertAdjacentHTML('beforeend', notificationStyles); 
+
+// Collapsible grids for sections with many cards
+function initCollapsibleGrids() {
+    const MAX_VISIBLE = 6; // default visible items
+    const sections = [
+        { selector: '#events .events-grid', buttonText: 'Show more events', lessText: 'Show fewer' },
+        { selector: '#media .events-grid', buttonText: 'Show more media', lessText: 'Show fewer' },
+        { selector: '#gallery .gallery-grid', buttonText: 'Show more photos', lessText: 'Show fewer' }
+    ];
+
+    sections.forEach(cfg => {
+        const grid = document.querySelector(cfg.selector);
+        if (!grid) return;
+        const items = Array.from(grid.children);
+        if (items.length <= MAX_VISIBLE) return;
+
+        items.forEach((item, index) => {
+            if (index >= MAX_VISIBLE) {
+                item.style.display = 'none';
+            }
+        });
+
+        const btn = document.createElement('button');
+        btn.className = 'button button-secondary collapsible-toggle';
+        btn.textContent = cfg.buttonText;
+        btn.setAttribute('aria-expanded', 'false');
+        grid.parentElement.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+            const expanded = btn.getAttribute('aria-expanded') === 'true';
+            if (expanded) {
+                items.forEach((item, index) => {
+                    if (index >= MAX_VISIBLE) item.style.display = 'none';
+                });
+                btn.setAttribute('aria-expanded', 'false');
+                btn.textContent = cfg.buttonText;
+            } else {
+                items.forEach(item => { item.style.display = ''; });
+                btn.setAttribute('aria-expanded', 'true');
+                btn.textContent = cfg.lessText;
+            }
+        });
+    });
+}

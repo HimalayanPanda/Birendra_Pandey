@@ -2,6 +2,29 @@
 
 /* Mobile Breakpoint: 320px - 768px */
 @media screen and (max-width: 768px) {
+    /* Snappier, subtler animations on mobile */
+    .fade-in,
+    .slide-in-left,
+    .slide-in-right,
+    .fade-in-up,
+    .scale-in,
+    .card-entrance,
+    .gallery-entrance,
+    .section-entrance {
+        transition-duration: 0.22s !important;
+        transform: none !important;
+    }
+
+    .button,
+    .gallery-item,
+    .event-card,
+    .nav-link,
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        transition-duration: 0.18s !important;
+    }
+
     /* Typography Scaling */
     :root {
         --h1-size: 2.5rem;
@@ -44,6 +67,9 @@
         gap: 2rem;
     }
 
+    /* If row layout is not available (single column), hide the hero image */
+    .hero-image { display: none; }
+
     .hero-title {
         font-size: 2.5rem;
     }
@@ -57,8 +83,9 @@
     }
 
     .profile-image {
-        width: 250px;
-        height: 250px;
+        width: clamp(180px, 45vw, 380px);
+        height: auto;
+        border-radius: 0;
     }
 
     /* About Section */
@@ -125,8 +152,9 @@
     }
 
     .profile-image {
-        width: 280px;
-        height: 280px;
+        width: clamp(220px, 35vw, 460px);
+        height: auto;
+        border-radius: 0;
     }
 
     /* About Section */

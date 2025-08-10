@@ -3,9 +3,9 @@
 /* Base Animation Classes */
 .fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -22,9 +22,9 @@
 /* Enhanced Slide Animations */
 .slide-in-left {
     opacity: 0;
-    transform: translateX(-80px) scale(0.95);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50px) scale(0.97);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -40,9 +40,9 @@
 
 .slide-in-right {
     opacity: 0;
-    transform: translateX(80px) scale(0.95);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(50px) scale(0.97);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -59,9 +59,9 @@
 /* Enhanced Scale Animation */
 .scale-in {
     opacity: 0;
-    transform: scale(0.7) rotate(-5deg);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.85) rotate(-2deg);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -78,9 +78,9 @@
 /* Enhanced Stagger Animation for Lists */
 .stagger-item {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(16px) scale(0.98);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -104,9 +104,9 @@
 /* Section Entrance Animations */
 .section-entrance {
     opacity: 0;
-    transform: translateY(50px) scale(0.95);
-    transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(30px) scale(0.97);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .section-entrance.visible {
@@ -122,9 +122,9 @@
 /* Card Entrance Animations */
 .card-entrance {
     opacity: 0;
-    transform: translateY(40px) scale(0.9);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(24px) scale(0.96);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -141,9 +141,9 @@
 /* Gallery Item Animations */
 .gallery-entrance {
     opacity: 0;
-    transform: scale(0.8) rotateY(15deg);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.9) rotateY(8deg);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -160,9 +160,9 @@
 /* Enhanced Fade-in-up Animation */
 .fade-in-up {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px) scale(0.98);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -179,9 +179,9 @@
 /* Enhanced Zoom-in Animation */
 .zoom-in {
     opacity: 0;
-    transform: scale(0.6) rotate(-3deg);
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.85) rotate(-2deg);
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: opacity, transform;
 }
 
@@ -203,7 +203,7 @@
     border: 3px solid rgba(247, 181, 0, 0.3);
     border-radius: 50%;
     border-top-color: var(--warm-gold);
-    animation: spin 1s ease-in-out infinite;
+    animation: spin 0.6s linear infinite;
 }
 
 @keyframes spin {
@@ -252,7 +252,7 @@
     overflow: hidden;
     border-right: 3px solid var(--warm-gold);
     white-space: nowrap;
-    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    animation: typing 2.2s steps(40, end), blink-caret 0.6s step-end infinite;
 }
 
 @keyframes typing {
@@ -421,8 +421,8 @@
 }
 
 .hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
 .hover-scale {
@@ -430,7 +430,7 @@
 }
 
 .hover-scale:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .hover-rotate {
@@ -446,7 +446,7 @@
 }
 
 .hover-glow:hover {
-    box-shadow: 0 0 20px var(--warm-gold);
+    box-shadow: 0 0 10px var(--warm-gold);
 }
 
 /* Smooth Scroll Behavior */

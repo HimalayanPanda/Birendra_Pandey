@@ -4,6 +4,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     initGalleryLightbox();
     initEventLightbox();
+    initYouTubeThumbnails();
+    initVideoOverlays();
 });
 
 // Gallery Lightbox
@@ -28,20 +30,28 @@ function initGalleryLightbox() {
                 lightbox.style.display = 'block';
                 document.body.style.overflow = 'hidden';
                 
-                // Add fade-in animation
+                // Add snappier fade-in
                 setTimeout(() => {
                     lightbox.style.opacity = '1';
-                }, 10);
+                }, 5);
             });
         });
         
-        // Close lightbox
+        // Close lightbox and cleanup embeds
         function closeLightbox() {
+            // Stop any playing videos by clearing content immediately
+            if (lightboxCaption) {
+                lightboxCaption.innerHTML = '';
+            }
+            lightbox.classList.remove('is-embed');
+            if (lightboxImg) {
+                lightboxImg.style.display = '';
+            }
             lightbox.style.opacity = '0';
             setTimeout(() => {
                 lightbox.style.display = 'none';
                 document.body.style.overflow = 'auto';
-            }, 300);
+            }, 180);
         }
         
         // Close button
@@ -94,7 +104,7 @@ function initGalleryLightbox() {
 
 // Event Lightbox
 function initEventLightbox() {
-    const eventCards = document.querySelectorAll('.event-card');
+    const eventCards = document.querySelectorAll('#events .event-card, #publications .event-card');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const lightboxCaption = document.getElementById('lightbox-caption');
@@ -106,17 +116,61 @@ function initEventLightbox() {
                 const eventTitle = this.querySelector('h3').textContent;
                 const eventDate = this.querySelector('.event-date').textContent;
                 const eventLocation = this.querySelector('.event-location').textContent;
-                const eventDescription = this.querySelector('.event-description').textContent;
+                const eventDescriptionEl = this.querySelector('.event-description');
+                const eventDescription = eventDescriptionEl ? eventDescriptionEl.textContent : '';
+                const videoId = this.dataset.videoId || '';
+                const primaryLinkEl = eventDescriptionEl ? eventDescriptionEl.querySelector('a[href]') : null;
+                const primaryLink = primaryLinkEl ? primaryLinkEl.href : '';
+                const moreEl = this.querySelector('.event-more');
+                const extraHtml = moreEl ? moreEl.innerHTML : '';
+                const links = eventDescriptionEl ? Array.from(eventDescriptionEl.querySelectorAll('a[href]')) : [];
                 
-                // Create event details content
+                let mediaBlock = '';
+                if (videoId) {
+                    const embedSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+                    mediaBlock = `
+                        <div class="video-embed">
+                            <iframe src="${embedSrc}" title="${eventTitle}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    `;
+                } else {
+                    mediaBlock = `<img src="${eventImage.src}" alt="${eventTitle}">`;
+                }
+                
+                const actionsBlock = `
+                    <div class="event-actions">
+                        ${primaryLink ? `<a href="${primaryLink}" class="button button-primary small" target="_blank" rel="noopener">${videoId ? 'Open on YouTube' : 'Open Link'}</a>` : ''}
+                        ${primaryLink ? `<button class="button button-secondary small copy-link" data-url="${primaryLink}">Copy Link</button>` : ''}
+                    </div>
+                `;
+
+                const linksBlock = links && links.length > 0 ? `
+                    <div class="event-links">
+                        <h4>Media links</h4>
+                        <ul>
+                            ${links.map(a => `<li><a href="${a.href}" target="_blank" rel="noopener">${a.textContent || a.href}</a></li>`).join('')}
+                        </ul>
+                    </div>
+                ` : '';
+
+                const moreBlock = extraHtml ? `
+                    <div class="event-more">
+                        <h4>Additional details</h4>
+                        ${extraHtml}
+                    </div>
+                ` : '';
+
                 const eventDetails = `
                     <div class="event-lightbox-content">
-                        <img src="${eventImage.src}" alt="${eventTitle}">
+                        ${mediaBlock}
                         <div class="event-lightbox-info">
                             <h3>${eventTitle}</h3>
                             <p class="event-date">${eventDate}</p>
                             <p class="event-location">${eventLocation}</p>
                             <p class="event-description">${eventDescription}</p>
+                            ${linksBlock}
+                            ${moreBlock}
+                            ${actionsBlock}
                         </div>
                     </div>
                 `;
@@ -124,18 +178,105 @@ function initEventLightbox() {
                 // Set lightbox content
                 lightboxImg.style.display = 'none';
                 lightboxCaption.innerHTML = eventDetails;
+                if (videoId) {
+                    lightbox.classList.add('is-embed');
+                }
                 
                 // Show lightbox
                 lightbox.style.display = 'block';
                 document.body.style.overflow = 'hidden';
                 
-                // Add fade-in animation
+                // Add snappier fade-in
                 setTimeout(() => {
                     lightbox.style.opacity = '1';
-                }, 10);
+                }, 5);
+
+                // Wire copy link
+                const copyBtn = lightboxCaption.querySelector('.copy-link');
+                if (copyBtn) {
+                    copyBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        const url = copyBtn.dataset.url || '';
+                        try {
+                            await navigator.clipboard.writeText(url);
+                            if (typeof window.showNotification === 'function') {
+                                window.showNotification('Link copied to clipboard', 'success');
+                            }
+                        } catch (err) {
+                            // Fallback
+                        }
+                    });
+                }
             });
         });
     }
+}
+
+// Derive YouTube thumbnails and attach video IDs
+function initYouTubeThumbnails() {
+    const eventCards = document.querySelectorAll('#events .event-card');
+    eventCards.forEach(card => {
+        const descLink = card.querySelector('.event-description a[href]');
+        if (!descLink) return;
+        const url = new URL(descLink.href, window.location.href);
+        let videoId = '';
+        if (url.hostname.includes('youtu.be')) {
+            videoId = url.pathname.replace('/', '');
+        } else if (url.hostname.includes('youtube.com')) {
+            videoId = url.searchParams.get('v') || '';
+        }
+        // Fallback: try to parse from text
+        if (!videoId) {
+            const match = descLink.href.match(/(?:v=|\.be\/)([A-Za-z0-9_-]{6,})/);
+            if (match) videoId = match[1];
+        }
+        if (videoId) {
+            card.dataset.videoId = videoId;
+            const imgEl = card.querySelector('.event-image img');
+            if (imgEl) {
+                const thumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+                imgEl.src = thumb;
+                imgEl.loading = 'lazy';
+                imgEl.decoding = 'async';
+                imgEl.referrerPolicy = 'no-referrer';
+                imgEl.alt = imgEl.alt || 'Video thumbnail';
+            }
+        }
+    });
+}
+
+// Add low-opacity play overlays to any card with video links (events + media)
+function initVideoOverlays() {
+    const selectors = ['#events .event-card', '#media .event-card', '#publications .event-card'];
+    selectors.forEach(sel => {
+        document.querySelectorAll(sel).forEach(card => {
+            let hasVideo = false;
+            let videoId = card.dataset.videoId || '';
+            if (videoId) {
+                hasVideo = true;
+            } else {
+                const link = card.querySelector('.event-description a[href]');
+                if (link) {
+                    try {
+                        const url = new URL(link.href, window.location.href);
+                        if (url.hostname.includes('youtu.be') || url.hostname.includes('youtube.com')) {
+                            hasVideo = true;
+                        }
+                    } catch (e) {}
+                }
+            }
+            if (hasVideo) {
+                card.classList.add('has-video');
+                const imgWrap = card.querySelector('.event-image');
+                if (imgWrap && !imgWrap.querySelector('.play-overlay')) {
+                    const overlay = document.createElement('span');
+                    overlay.className = 'play-overlay';
+                    overlay.setAttribute('aria-hidden', 'true');
+                    imgWrap.appendChild(overlay);
+                }
+            }
+        });
+    });
 }
 
 // Add CSS for lightbox
@@ -199,7 +340,8 @@ const lightboxStyles = `
             flex-direction: column;
             align-items: center;
             gap: 1rem;
-            max-width: 600px;
+            width: 100%;
+            max-width: 90vw;
             margin: 0 auto;
         }
         
@@ -210,9 +352,7 @@ const lightboxStyles = `
             border-radius: 6px;
         }
         
-        .event-lightbox-info {
-            text-align: center;
-        }
+        .event-lightbox-info { text-align: center; }
         
         .event-lightbox-info h3 {
             color: var(--accent-gold);
@@ -236,6 +376,9 @@ const lightboxStyles = `
             line-height: 1.6;
         }
         
+        .event-actions { display: flex; gap: 0.75rem; justify-content: center; margin-top: 0.5rem; }
+        .event-actions .button.small { padding: 8px 14px; font-size: 0.9rem; }
+
         /* Responsive lightbox */
         @media (max-width: 768px) {
             .lightbox-content {
@@ -244,13 +387,10 @@ const lightboxStyles = `
             }
             
             .lightbox-caption {
-                max-width: 90%;
-                bottom: 10px;
+                max-width: 100%;
             }
             
-            .event-lightbox-content {
-                max-width: 90%;
-            }
+            .event-lightbox-content { max-width: 96vw; }
             
             .event-lightbox-content img {
                 max-height: 200px;

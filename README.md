@@ -38,7 +38,13 @@ This website is built with a focus on:
 
 ```
 brp-website/
-├── index.html                 # Main HTML file
+├── index.html                 # Home
+├── about.html                 # Biography & Leadership
+├── work.html                  # Projects & Events
+├── insights.html              # Publications & Education
+├── media.html                 # Media & Gallery
+├── advocacy.html              # Policy & Advocacy
+├── contact.html               # Contact
 ├── css/
 │   ├── style.css             # Main stylesheet
 │   ├── responsive.css        # Responsive design rules
@@ -185,6 +191,24 @@ brp-website/
 - Form validation and submission
 
 ## 📝 Development Notes
+### Sitemap (multipage)
+- /index.html → Home (hero only; other sections moved)
+- /about.html → About, Awards
+- /work.html → Events, Projects
+- /insights.html → Publications, Education
+- /media.html → Gallery
+- /advocacy.html → Advocacy
+- /contact.html → Contact form
+
+### Migration checklist
+- Move `#about` and `#awards` blocks to `about.html`
+- Move `#events` and `#projects` to `work.html`
+- Move Publications list to `insights.html#publications` and Education to `#education`
+- Move `#gallery` to `media.html#gallery`
+- Move `#advocacy` to `advocacy.html`
+- Move `#contact` form to `contact.html`
+- Update all nav/footer links to absolute page paths (done)
+- Keep assets referenced as `/css`, `/js`, `/images`
 
 ### Design Inspiration
 The website design is inspired by [Binod Chaudhary's website](https://binodchaudhary.com/) with emphasis on:
